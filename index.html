@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dictation Studio — Học chép chính tả từ YouTube</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🎧</div>
+        <div>
+          <h1>Dictation Studio</h1>
+          <p>Nghe từng câu • Gõ chính xác • Ôn lỗi sai • Luyện shadowing</p>
+        </div>
+      </div>
+
+      <div class="source-loader">
+        <label class="input-shell" aria-label="Dán link YouTube">
+          <span>▶</span>
+          <input id="youtubeUrl" type="url" placeholder="Dán link YouTube hoặc ID video..." />
+        </label>
+        <button class="btn btn-primary" id="loadVideoBtn">Tải video</button>
+        <button class="btn" id="demoBtn">Dùng bài demo</button>
+      </div>
+    </header>
+
+    <main class="main-shell">
+      <section class="panel video-panel">
+        <div class="panel-head">
+          <h2>Video Player</h2>
+          <span class="chip" id="videoStatus">Chưa tải video</span>
+        </div>
+
+        <div class="player-wrap">
+          <div class="video-stage">
+            <div id="player"></div>
+            <div class="video-placeholder" id="videoPlaceholder">
+              <div class="placeholder-card">
+                <div class="emoji">📺</div>
+                <h3>Sẵn sàng luyện chép chính tả</h3>
+                <p>Dán một link YouTube hoặc dùng bài demo. Ứng dụng sẽ điều khiển video theo từng phân đoạn câu.</p>
+              </div>
+            </div>
+          </div>
+
+          <article class="segment-card">
+            <strong id="currentSegmentTitle">Câu hiện tại: 1 / 5</strong>
+            <div class="segment-meta">
+              <span id="segmentTime">00:00.0 → 00:04.5</span>
+              <span id="segmentWords">8 từ</span>
+              <span id="segmentDifficulty">Độ khó: Trung bình</span>
+            </div>
+            <div class="segment-actions">
+              <button class="btn btn-primary" id="playSegmentBtn">▶ Phát câu</button>
+              <button class="btn" id="replaySegmentBtn">↺ Phát lại</button>
+            </div>
+          </article>
+
+          <article class="offset-card">
+            <div>
+              <strong>Tinh chỉnh điểm cắt câu</strong>
+              <p class="muted">Kéo để bù lệch phụ đề theo bước 0.1 giây.</p>
+            </div>
+            <div class="offset-grid">
+              <label class="range-row">
+                <span>Bắt đầu</span>
+                <input id="startOffset" type="range" min="-1" max="1" step="0.1" value="0" />
+                <output id="startOffsetValue">0.0s</output>
+              </label>
+              <label class="range-row">
+                <span>Kết thúc</span>
+                <input id="endOffset" type="range" min="-1" max="1" step="0.1" value="0" />
+                <output id="endOffsetValue">0.0s</output>
+              </label>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel workspace-panel">
+        <div class="panel-head">
+          <h2>Workspace</h2>
+          <span class="chip">Enter để nộp • Ctrl để nghe lại</span>
+        </div>
+
+        <div class="workspace-body">
+          <div class="lesson-progress">
+            <div class="lesson-topline">
+              <h2 id="sentenceCounter">Câu 1 / 5</h2>
+              <span class="chip" id="accuracyChip">Độ chính xác: 0%</span>
+            </div>
+            <div class="progress-track" aria-label="Tiến độ câu">
+              <div class="progress-fill" id="sentenceProgress"></div>
+            </div>
+          </div>
+
+          <div class="question-box">
+            <small>Mục tiêu</small>
+            <p id="promptText">Nghe đoạn video và chép lại chính xác câu vừa phát. Nút Next chỉ mở khi câu đúng 100%.</p>
+          </div>
+
+          <div class="editor-shell">
+            <label class="sr-only" for="answerInput">Nhập câu nghe được</label>
+            <textarea id="answerInput" placeholder="Gõ nội dung bạn nghe được ở đây..."></textarea>
+            <div class="review-line" id="reviewLine">Kết quả kiểm tra từng từ sẽ hiển thị tại đây.</div>
+          </div>
+
+          <div class="helper-row">
+            <div class="hint-actions">
+              <button class="btn" id="hintFirstBtn">💡 Chữ đầu</button>
+              <button class="btn" id="hintVowelsBtn">◌ Nguyên âm</button>
+              <button class="btn" id="hintWordCountBtn"># Số từ</button>
+            </div>
+            <div class="hint-output" id="hintOutput">Chưa dùng gợi ý.</div>
+          </div>
+
+          <div class="check-options">
+            <label class="toggle-label">
+              <input type="checkbox" id="caseSensitiveToggle" />
+              Phân biệt hoa/thường
+            </label>
+            <label class="toggle-label">
+              <input type="checkbox" id="punctuationToggle" />
+              Bắt buộc dấu câu
+            </label>
+          </div>
+
+          <div class="submit-row">
+            <div class="status-pill" id="answerStatus">⏳ Chưa nộp đáp án</div>
+            <div class="submit-row">
+              <button class="btn btn-primary" id="submitBtn">Submit</button>
+              <button class="btn btn-success" id="nextBtn" disabled>Next →</button>
+            </div>
+          </div>
+
+          <div class="shortcut-card">
+            <div>
+              <kbd>Ctrl</kbd>
+              <span>Phát lại câu hiện tại</span>
+            </div>
+            <div>
+              <kbd>Enter</kbd>
+              <span>Nộp đáp án</span>
+            </div>
+            <div>
+              <kbd>Shift + Enter</kbd>
+              <span>Xuống dòng trong textarea</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel sidebar-panel">
+        <div class="panel-head">
+          <h3>Trang của tôi</h3>
+          <span class="chip">Tự lưu cục bộ</span>
+        </div>
+
+        <div class="sidebar-scroll">
+          <div class="stat-grid">
+            <article class="stat-card">
+              <strong id="completedCount">0</strong>
+              <span>Câu hoàn thành</span>
+            </article>
+            <article class="stat-card">
+              <strong id="mistakeCount">0</strong>
+              <span>Lỗi đã ghi nhận</span>
+            </article>
+            <article class="stat-card">
+              <strong id="hintCount">0</strong>
+              <span>Gợi ý đã dùng</span>
+            </article>
+            <article class="stat-card">
+              <strong id="sessionAccuracy">0%</strong>
+              <span>Độ chính xác buổi học</span>
+            </article>
+          </div>
+
+          <article class="vocab-card">
+            <div>
+              <strong>Sổ từ vựng & lỗi sai</strong>
+              <p class="muted">Từ nhập sai sẽ được ghi lại để luyện lại.</p>
+            </div>
+            <div class="mistake-list" id="mistakeList"></div>
+            <div class="vocab-actions">
+              <button class="btn" id="reviewMistakesBtn">Thử thách lại</button>
+              <button class="btn" id="clearMistakesBtn">Xóa sổ lỗi</button>
+            </div>
+          </article>
+
+          <article class="shadow-card">
+            <div>
+              <strong>Shadowing</strong>
+              <p class="muted">Ghi âm lại sau khi hoàn thành một câu, xem waveform giọng nói và phát lại.</p>
+            </div>
+            <canvas class="waveform" id="waveformCanvas" width="280" height="92"></canvas>
+            <audio class="audio-playback" id="audioPlayback" controls></audio>
+            <div class="shadow-actions">
+              <button class="btn" id="recordBtn" disabled>🎙 Bắt đầu ghi</button>
+              <button class="btn btn-danger" id="stopRecordBtn" disabled>■ Dừng</button>
+            </div>
+          </article>
+
+          <article class="note-card">
+            <strong>Ghi chú bài học</strong>
+            <label class="mini-input">
+              <input id="manualWordInput" type="text" placeholder="Đánh dấu từ mới cần nhớ..." />
+            </label>
+            <button class="btn" id="addManualWordBtn">+ Thêm vào sổ từ</button>
+            <div class="vocab-list" id="manualWordList"></div>
+          </article>
+        </div>
+      </aside>
+    </main>
+
+    <section class="control-bar">
+      <div class="overall-progress">
+        <div>
+          <strong>Tiến độ tổng thể</strong>
+          <span class="muted" id="overallText">0 / 5 câu</span>
+        </div>
+        <div class="progress-track" aria-label="Tiến độ toàn bài">
+          <div class="progress-fill" id="overallProgress"></div>
+        </div>
+      </div>
+
+      <div class="speed-group">
+        <strong>Tốc độ phát</strong>
+        <div class="speed-pills">
+          <button class="pill-btn" data-rate="0.5">0.5×</button>
+          <button class="pill-btn" data-rate="0.75">0.75×</button>
+          <button class="pill-btn active" data-rate="1">1.0×</button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-pills">
+          <button class="btn" id="finishBtn">Xem báo cáo</button>
+          <button class="btn" id="resetBtn">Làm lại buổi học</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-drawer" id="summaryDrawer">
+      <div class="lesson-topline">
+        <h2>Báo cáo kết quả</h2>
+        <button class="btn" id="closeSummaryBtn">Đóng</button>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-box">
+          <span class="muted">Câu hoàn thành</span>
+          <strong id="summaryCompleted">0</strong>
+        </div>
+        <div class="summary-box">
+          <span class="muted">Độ chính xác</span>
+          <strong id="summaryAccuracy">0%</strong>
+        </div>
+        <div class="summary-box">
+          <span class="muted">Gợi ý đã dùng</span>
+          <strong id="summaryHints">0</strong>
+        </div>
+        <div class="summary-box">
+          <span class="muted">Từ khó đã ghi</span>
+          <strong id="summaryMistakes">0</strong>
+        </div>
+      </div>
+      <div class="question-box">
+        <small>Gợi ý ôn tập</small>
+        <p id="summaryAdvice">Hoàn thành từng câu để nhận phân tích cá nhân.</p>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Bản này là web app frontend một file. Có sẵn điểm cắm cho YouTube Player, transcript theo timestamp, chấm đáp án, hint, review và shadowing.
+    </p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
