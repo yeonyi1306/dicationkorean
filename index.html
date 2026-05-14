@@ -27,6 +27,46 @@
       </div>
     </header>
 
+    <section class="transcript-panel" id="transcriptPanel">
+      <div class="transcript-head">
+        <div>
+          <h2>Phụ đề / Script cho video</h2>
+          <p id="transcriptStatus">
+            Khi đổi sang video mới, hãy nạp phụ đề có timestamp để hệ thống cập nhật câu cần chép và đáp án.
+          </p>
+        </div>
+        <div class="transcript-head-actions">
+          <label class="btn file-btn">
+            📄 Tải file .srt / .vtt
+            <input id="subtitleFileInput" type="file" accept=".srt,.vtt,text/vtt,application/x-subrip" hidden />
+          </label>
+          <button class="btn" id="toggleTranscriptBtn">Ẩn / hiện ô dán</button>
+        </div>
+      </div>
+
+      <div class="transcript-body" id="transcriptBody">
+        <label class="sr-only" for="subtitlePasteInput">Dán phụ đề SRT hoặc VTT</label>
+        <textarea id="subtitlePasteInput" class="subtitle-textarea" placeholder="Dán phụ đề có timestamp vào đây, ví dụ:
+
+WEBVTT
+
+00:00:01.000 --> 00:00:03.400
+Xin chào mọi người.
+
+00:00:03.800 --> 00:00:06.100
+Hôm nay chúng ta sẽ luyện nghe."></textarea>
+
+        <div class="transcript-actions">
+          <label class="toggle-label">
+            <input type="checkbox" id="skipNonSpeechToggle" checked />
+            Tự bỏ qua đoạn trống / không có lời thoại
+          </label>
+          <button class="btn btn-primary" id="loadTranscriptBtn">Nạp script</button>
+          <button class="btn" id="clearTranscriptBtn">Xóa script hiện tại</button>
+        </div>
+      </div>
+    </section>
+
     <main class="main-shell">
       <section class="panel video-panel">
         <div class="panel-head">
@@ -41,21 +81,21 @@
               <div class="placeholder-card">
                 <div class="emoji">📺</div>
                 <h3>Sẵn sàng luyện chép chính tả</h3>
-                <p>Dán một link YouTube hoặc dùng bài demo. Ứng dụng sẽ điều khiển video theo từng phân đoạn câu.</p>
+                <p>Dán một link YouTube hoặc dùng bài demo. Sau đó nạp phụ đề .srt/.vtt để cập nhật script theo video.</p>
               </div>
             </div>
           </div>
 
           <article class="segment-card">
-            <strong id="currentSegmentTitle">Câu hiện tại: 1 / 5</strong>
+            <strong id="currentSegmentTitle">Chưa có script</strong>
             <div class="segment-meta">
-              <span id="segmentTime">00:00.0 → 00:04.5</span>
-              <span id="segmentWords">8 từ</span>
-              <span id="segmentDifficulty">Độ khó: Trung bình</span>
+              <span id="segmentTime">--:--.- → --:--.-</span>
+              <span id="segmentWords">0 từ</span>
+              <span id="segmentDifficulty">Độ khó: —</span>
             </div>
             <div class="segment-actions">
-              <button class="btn btn-primary" id="playSegmentBtn">▶ Phát câu</button>
-              <button class="btn" id="replaySegmentBtn">↺ Phát lại</button>
+              <button class="btn btn-primary" id="playSegmentBtn" disabled>▶ Phát câu</button>
+              <button class="btn" id="replaySegmentBtn" disabled>↺ Phát lại</button>
             </div>
           </article>
 
@@ -89,7 +129,7 @@
         <div class="workspace-body">
           <div class="lesson-progress">
             <div class="lesson-topline">
-              <h2 id="sentenceCounter">Câu 1 / 5</h2>
+              <h2 id="sentenceCounter">Chưa nạp script</h2>
               <span class="chip" id="accuracyChip">Độ chính xác: 0%</span>
             </div>
             <div class="progress-track" aria-label="Tiến độ câu">
@@ -99,20 +139,20 @@
 
           <div class="question-box">
             <small>Mục tiêu</small>
-            <p id="promptText">Nghe đoạn video và chép lại chính xác câu vừa phát. Nút Next chỉ mở khi câu đúng 100%.</p>
+            <p id="promptText">Tải video và nạp phụ đề có timestamp. Hệ thống sẽ tự tạo câu để nghe, nhập và kiểm tra.</p>
           </div>
 
           <div class="editor-shell">
             <label class="sr-only" for="answerInput">Nhập câu nghe được</label>
-            <textarea id="answerInput" placeholder="Gõ nội dung bạn nghe được ở đây..."></textarea>
+            <textarea id="answerInput" placeholder="Gõ nội dung bạn nghe được ở đây..." disabled></textarea>
             <div class="review-line" id="reviewLine">Kết quả kiểm tra từng từ sẽ hiển thị tại đây.</div>
           </div>
 
           <div class="helper-row">
             <div class="hint-actions">
-              <button class="btn" id="hintFirstBtn">💡 Chữ đầu</button>
-              <button class="btn" id="hintVowelsBtn">◌ Nguyên âm</button>
-              <button class="btn" id="hintWordCountBtn"># Số từ</button>
+              <button class="btn" id="hintFirstBtn" disabled>💡 Chữ đầu</button>
+              <button class="btn" id="hintVowelsBtn" disabled>◌ Nguyên âm</button>
+              <button class="btn" id="hintWordCountBtn" disabled># Số từ</button>
             </div>
             <div class="hint-output" id="hintOutput">Chưa dùng gợi ý.</div>
           </div>
@@ -129,9 +169,9 @@
           </div>
 
           <div class="submit-row">
-            <div class="status-pill" id="answerStatus">⏳ Chưa nộp đáp án</div>
+            <div class="status-pill" id="answerStatus">⏳ Chưa nạp script</div>
             <div class="submit-row">
-              <button class="btn btn-primary" id="submitBtn">Submit</button>
+              <button class="btn btn-primary" id="submitBtn" disabled>Submit</button>
               <button class="btn btn-success" id="nextBtn" disabled>Next →</button>
             </div>
           </div>
@@ -220,7 +260,7 @@
       <div class="overall-progress">
         <div>
           <strong>Tiến độ tổng thể</strong>
-          <span class="muted" id="overallText">0 / 5 câu</span>
+          <span class="muted" id="overallText">0 / 0 câu</span>
         </div>
         <div class="progress-track" aria-label="Tiến độ toàn bài">
           <div class="progress-fill" id="overallProgress"></div>
@@ -274,9 +314,10 @@
     </section>
 
     <p class="footer-note">
-      Bản này là web app frontend một file. Có sẵn điểm cắm cho YouTube Player, transcript theo timestamp, chấm đáp án, hint, review và shadowing.
+      Khi đổi video, script demo sẽ được xóa ngay. Bạn cần nạp phụ đề SRT/VTT tương ứng để phần nhập và kiểm tra đáp án cập nhật theo video mới.
     </p>
   </div>
+
   <script src="app.js"></script>
 </body>
 </html>
