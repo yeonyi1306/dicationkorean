@@ -1,34 +1,58 @@
-# Dictation Studio
+# Dictation Studio v3
 
 Web app luyện chép chính tả với video YouTube.
 
-## Bản cập nhật v2
-- Khi đổi link YouTube, script demo cũ sẽ **tự xóa**, không còn check đáp án theo demo.
-- Có thể nạp phụ đề/script thật bằng:
-  - File `.srt`
-  - File `.vtt`
-  - Dán trực tiếp nội dung SRT/VTT vào ô nhập
-- Tự tạo danh sách câu theo timestamp.
-- Tự bỏ qua:
-  - Đoạn trống
-  - Cue không có chữ
-  - Một số cue không lời thoại như `[Music]`, `[Applause]`, `♪`, `nhạc`, `vỗ tay`...
-- Tự bỏ cue trùng liên tiếp trong phụ đề.
+## Điểm mới trong v3
+- Thêm nút **Kho video có sẵn** ở trang chính.
+- Tạo trang `library.html` hiển thị danh sách video do admin cấu hình trước.
+- Khi bấm vào một video trong kho:
+  - Tự quay về trang luyện
+  - Tự tải đúng video
+  - Tự nạp đúng script/timestamp
+  - Dùng đầy đủ tính năng giống trang chính:
+    - Phát từng câu
+    - Tự dừng
+    - Ctrl để nghe lại
+    - Nhập và check đáp án
+    - Gợi ý
+    - Lưu lỗi sai
+    - Shadowing
+- Có ô tìm kiếm video trong kho.
+- Dữ liệu kho video nằm trong `lessons.js`.
 
-## Cấu trúc
-- `index.html` — cấu trúc giao diện
-- `styles.css` — toàn bộ giao diện và responsive
-- `app.js` — logic phát video, parse SRT/VTT, kiểm tra đáp án, hint, review, shadowing
+## Cấu trúc file
+- `index.html` — trang luyện chép chính tả
+- `library.html` — trang kho video có sẵn
+- `styles.css` — giao diện dùng chung
+- `app.js` — logic trang luyện
+- `library.js` — logic trang kho video
+- `lessons.js` — dữ liệu video/script do admin cấu hình
+- `README.md`
 
-## Cách dùng
-1. Dán link YouTube.
-2. Bấm **Tải video**.
-3. Tải file `.srt` / `.vtt` hoặc dán phụ đề có timestamp.
-4. Bấm **Nạp script**.
-5. Bắt đầu luyện nghe, nhập đáp án và chấm.
+## Cách thêm video vào kho
+Mở file `lessons.js`, thêm một object vào mảng `ADMIN_LESSONS`:
 
-## Lưu ý kỹ thuật
-Bản GitHub Pages/frontend thuần không tự lấy được transcript chính thức của mọi video YouTube.
-Vì vậy bản này dùng cách ổn định hơn: nạp phụ đề SRT/VTT tương ứng với video.
+```js
+{
+  id: "video-id-rieng",
+  title: "Tên video",
+  description: "Mô tả bài luyện",
+  language: "Korean",
+  level: "Trung bình",
+  videoId: "YouTubeVideoID",
+  thumbnail: "https://img.youtube.com/vi/YouTubeVideoID/hqdefault.jpg",
+  segments: [
+    { start: 1.2, end: 3.5, text: "Câu lời thoại thứ nhất", difficulty: "Dễ" },
+    { start: 4.0, end: 6.8, text: "Câu lời thoại thứ hai", difficulty: "Trung bình" }
+  ]
+}
+```
 
-Nếu sau này làm bản có backend, có thể xây thêm luồng tự động lấy/chuyển đổi transcript rồi trả về cho frontend.
+## Ghi chú quan trọng
+Đây là bản frontend tĩnh, phù hợp để up GitHub Pages.
+
+Tên "admin tải lên sẵn" trong bản này được triển khai theo cách:
+- Admin chủ động thêm dữ liệu video/script vào `lessons.js`
+- Video sẽ xuất hiện tự động trong `library.html`
+
+Nếu cần **admin upload video/script qua giao diện quản trị**, cần có backend + database hoặc một CMS.
