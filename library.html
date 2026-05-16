@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kho video có sẵn — Dictation Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🎧</div>
+        <div>
+          <h1>Dictation Studio</h1>
+          <p>Kho bài luyện chép chính tả được admin cấu hình sẵn</p>
+        </div>
+      </div>
+
+      <div class="settings-pills">
+        <a class="btn" href="index.html">← Quay lại trang luyện</a>
+      </div>
+    </header>
+
+    <main class="library-page">
+      <section class="library-hero">
+        <div>
+          <h1>📚 Kho video có sẵn</h1>
+          <p>
+            Chọn một video bên dưới để mở trang luyện chép chính tả với đầy đủ tính năng:
+            phát từng câu, tự dừng, nhập đáp án, kiểm tra lỗi, gợi ý, sổ lỗi sai và shadowing.
+          </p>
+        </div>
+      </section>
+
+      <section class="library-toolbar">
+        <label class="input-shell" aria-label="Tìm video">
+          <span>🔎</span>
+          <input id="librarySearchInput" type="search" placeholder="Tìm theo tên video, ngôn ngữ, độ khó..." />
+        </label>
+        <div class="library-count" id="libraryCount">0 video</div>
+      </section>
+
+      <section class="video-library-grid" id="videoLibraryGrid"></section>
+    </main>
+
+    <p class="footer-note">
+      Trang này dùng dữ liệu trong <strong>lessons.js</strong>. Admin chỉ cần thêm video và transcript vào file đó để video xuất hiện trong kho.
+    </p>
+  </div>
+
+  <script src="lessons.js"></script>
+  <script src="library.js"></script>
+</body>
+</html>
